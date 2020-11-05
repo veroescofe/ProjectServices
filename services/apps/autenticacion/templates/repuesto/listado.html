@@ -1,0 +1,23 @@
+{% extends 'base.html' %} {% block title %}Lista de repuestos{% endblock %} {% load crispy_forms_tags %} {% block content %}
+<div class="row">
+    <div class="col-9">
+        <div class="row">
+            {% if repuestos %} {% for repuestos in repuestos %}
+            <div class="col-md-6 col-sm-12 col-lg-4">
+                <div class="card">
+                    <img class="card-img-top" src="{{ repuestos.imagen.url }}" alt="{{ repuestos.nombre_repuesto }}">
+                    <div class="card-body" style="color: black;">
+                        <h5 class="card-title"> {{ repuestos.nombre_repuesto }}</h5>
+                        <p class="card-text">${{ repuestos.precio }}</p>
+                    </div>
+                    <div class='card-footer text-center'>
+                        <a href="" class="btn btn-primary">Editar</a>
+                        <a href="" class="btn btn-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %} {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
