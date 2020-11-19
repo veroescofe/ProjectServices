@@ -3,8 +3,9 @@ from apps.reparacion.forms import ReparacionForm,DetalleRepForm
 from django.urls.base import reverse_lazy
 from apps.reparacion.models import Reparacion,DetalleReparacion
 from django.http import HttpResponseRedirect
-
-
+from .serializers import ReparacionSerializers,DetalleReparacionSerializers
+from rest_framework.views import APIView
+from rest_framework.response import Response
 class DetalleCreate(CreateView):
     model=DetalleReparacion
     template_name='reparacion/reparacion_form.html'
@@ -32,3 +33,16 @@ class DetalleCreate(CreateView):
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form,form2=form2))
+
+
+class ReparacionList(APIView):
+    def get(self,request):
+        reparacion=Reparacion.objects.all()
+        serializer=ReparacionSerializers(reparacion,many=True)
+        return Response(serializer.data)
+
+class DetalleReparacionList(APIView):
+    def get(self,request):
+        detalle=DetalleReparacion.objects.all()
+        serializer=DetalleReparacionSerializers(detalle,many=True)
+        return Response(serializer.data)

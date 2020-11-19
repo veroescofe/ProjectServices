@@ -4,6 +4,10 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.http.response import HttpResponse
+from .serializers import UserSerializers
+from rest_framework.views import APIView
+from django.contrib.auth.models import User
+from rest_framework.response import Response
 # Create your views here.
 
 def index(request):
@@ -49,3 +53,9 @@ def salir(request):
     logout(request)
     messages.success(request, F'Tu sesión se ha cerrado correctamente')
     return redirect('acceder')
+
+class UserApi(APIView):
+    def get(self,request,format=None):
+        lista=User.objects.all()
+        serializer=UserSerializers(lista,many=True)
+        return Response(serializer.data)

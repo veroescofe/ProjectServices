@@ -4,6 +4,12 @@ from apps.cliente.forms import ClienteForm, SolicitudForm
 from django.urls.base import reverse_lazy
 from apps.cliente.models import Cliente,Solicitud
 from django.http import HttpResponseRedirect
+from .serializers import ClienteSerializers,SolicitudSerializers
+from .models import Cliente,Solicitud
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.http.response import Http404
+from rest_framework import status
 
 class SolicitudCreate(CreateView):
     model = Solicitud
@@ -32,3 +38,51 @@ class SolicitudCreate(CreateView):
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.render_to_response(self.get_context_data(form=form, form2=form2))
+
+class ClienteList(APIView):
+
+    def get(self,request):
+        cliente=Cliente.objects.all()
+        serializer=ClienteSerializers(cliente,many=True)
+        return Response(serializer.data)
+
+    def post(self,request):
+        serializer=ClienteSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+class ClienteDetail(APIView):
+    def get_object(self,pk):
+        try:
+            return Cliente.objects.get(pk=pk)
+        except Cliente.DoesNotExist:
+            raise Http404
+
+    def get(self,request,pk,format=None):
+        cliente=self.get_object(pk)
+        serializer=ClienteSerializers(cliente)
+        return Response(serializer.data)
+
+    def put(self,request,pk,format=None):
+        cliente=self.get_object(pk)
+        serializer=ClienteSerializers(cliente, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self,request,pk,format=None):
+        cliente=self.get_object(pk)
+        cliente.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+class SolicitudList(APIView):
+
+    def get(self,request):
+        solicitud=Solicitud.objects.all()
+        serializer=SolicitudSerializers(solicitud,many=True)
+        return Response(serializer.data)
+    
+    def post(self,request):
+        pass
