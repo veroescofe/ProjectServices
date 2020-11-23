@@ -1,48 +1,72 @@
-from django.views.generic import CreateView,ListView,DeleteView
-from apps.reparacion.forms import ReparacionForm,DetalleRepForm
-from django.urls.base import reverse_lazy
+from django.shortcuts import render
 from apps.reparacion.models import Reparacion,DetalleReparacion
-from django.http import HttpResponseRedirect
 from .serializers import ReparacionSerializers,DetalleReparacionSerializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
-class DetalleCreate(CreateView):
-    model=DetalleReparacion
-    template_name='reparacion/reparacion_form.html'
-    form_class=DetalleRepForm
-    second_form_class=ReparacionForm
-    success_url=reverse_lazy('reparacion')
-
-    def get_context_data(self, **kwargs):
-        context=super(DetalleCreate,self).get_context_data(**kwargs)
-        if 'form' not in context:
-            context['form']=self.form_class(self.request.GET)
-
-        if 'form2' not in context:
-            context['form2']=self.second_form_class(self.request.GET)
-        return context
-
-    def post(self, request, *args, **kwargs):
-        self.object=self.get_object
-        form=self.form_class(request.POST)
-        form2=self.second_form_class(request.POST)
-        if form.is_valid() and form2.is_valid():
-            reparacion=form2.save()
-            reparacion.detalle_reparacion=form.save()
-            reparacion.save()
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            return self.render_to_response(self.get_context_data(form=form,form2=form2))
-
-
+from rest_framework import status
 class ReparacionList(APIView):
     def get(self,request):
         reparacion=Reparacion.objects.all()
         serializer=ReparacionSerializers(reparacion,many=True)
         return Response(serializer.data)
+    
+    def post(self,request):
+        serializer=ReparacionSerializers(data=request.data)
+        if serializer.id_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
+class ReparacionDetail(APIView):
+    def get(self,request,pk):
+        reparacion=Reparacion.objects.filter(id=pk)
+        serializer=ReparacionSerializers(reparacion,many=True)
+        return Response(serializer.data)
+
+    def put(self,request,pk):
+        reparacion=Reparacion.objects.all(pk=pk)
+        serializer=ReparacionSerializers(reparacion,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+
+    def delete(self,request,pk):
+        reparacion=Reparacion.objects.get(pk=pk)
+        reparacion.delete()
+        return Response(status=status.HTTP_204_NO_CONTEN)
 class DetalleReparacionList(APIView):
     def get(self,request):
         detalle=DetalleReparacion.objects.all()
         serializer=DetalleReparacionSerializers(detalle,many=True)
         return Response(serializer.data)
+
+    def post(self,request):
+        serializer=DetalleReparacionSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+
+class DetalleReparacionDetail(APIView):
+    def get(self,request,pk):
+        detalle=DetalleReparacion.objects.filter(id=pk)
+        serializer=DetalleReparacionSerializers(detalle,many=True)
+        return Response(serializer.data)
+
+    def put(self,request,pk):
+        detalle=DetalleReparacion.objects.get(pk=pk)
+        serializer=DetalleReparacionSerializers(detalle, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
+    
+    def delete(self,request,pk):
+        detalle=DetalleReparacion.objects.all(pk=pk)
+        detalle.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

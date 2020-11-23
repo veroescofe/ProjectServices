@@ -1,7 +1,10 @@
 from django.urls import path
-from apps.repuesto.views import RepuestoList,listado_repuesto,RepuestoListSerial
+from apps.repuesto.views import (
+    RepuestoList,
+    RepuestoDetail,
+)
 
 urlpatterns = [
-    path('', listado_repuesto,name='listado'),
-    path('listado',RepuestoListSerial.as_view()),
+    path('listado/',RepuestoList.as_view()),
+    path('detalleRepuesto/<int:pk>',RepuestoDetail.as_view()),
 ]

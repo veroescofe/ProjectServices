@@ -8,10 +8,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('apps.autenticacion.urls')),
     path('accounts/',include('apps.autenticacion.urls')),
-    path('cliente/',include("apps.cliente.urls")),
-    path('repuesto/',include("apps.repuesto.urls")),
-    path('reparacion/',include("apps.reparacion.urls")),
-    path('venta/',include("apps.venta.urls")),
+    path('',include("apps.cliente.urls")),
+    path('',include("apps.repuesto.urls")),
+    path('',include("apps.reparacion.urls")),
+    path('',include("apps.venta.urls")),
     
 ]
 
